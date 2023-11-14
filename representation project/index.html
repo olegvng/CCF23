@@ -1,0 +1,87 @@
+<div>Display the correct color game</div>
+<script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/p5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5@latest/lib/addons/p5.dom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ml5@latest/dist/ml5.min.js"></script>
+<script type="text/javascript">
+  let classifier;
+  let imageModelURL = 'https://teachablemachine.withgoogle.com/models/qKKIFIhLx/';
+  let video;
+  let flippedVideo;
+  let label = "";
+  let available_colors = ['yellow', 'blue', 'red', 'black', 'green'];
+  let current_color = 0;
+  let message = "Waiting for you to display the color"
+
+  // Load the model first
+  function preload() {
+    classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+  }
+
+  function setup() {
+    createCanvas(320, 260);
+    // Create the video
+    video = createCapture(VIDEO);
+    video.size(320, 240);
+    video.hide();
+
+    flippedVideo = ml5.flipImage(video);
+    // Start classifying
+    classifyVideo();
+  }
+
+  function draw() {
+    background(0);
+    // Draw the video
+    image(flippedVideo, 0, 0);
+
+    // Draw the label
+    fill(255);
+    textSize(16);
+    textAlign(CENTER);
+    text(label, width / 2, height - 4);
+
+    //variable to store the color that has to be displayed
+    wanted_color = available_colors[current_color];
+    //message with a color to be displayed
+    text("Please show color " + wanted_color, width/2, height/2); 
+    //checking if the right color is displayed
+    //printing a message and moving to a next color that user
+    //has to display 
+    if(label == "no color"){
+      message = "Waiting for you do display the color";
+    }
+    text(message, width/2, height/2.5);
+    if(label == wanted_color){
+      if (current_color < available_colors.length - 1){
+        current_color += 1;
+        message = "Good job, this is correct color";
+      }
+      else{
+        current_color = 0;
+        message = "Good job, this is correct color";
+      }
+    }
+  }
+
+  // Get a prediction for the current video frame
+  function classifyVideo() {
+    flippedVideo = ml5.flipImage(video)
+    classifier.classify(flippedVideo, gotResult);
+    flippedVideo.remove();
+
+  }
+
+  // When we get a result
+  function gotResult(error, results) {
+    // If there is an error
+    if (error) {
+      console.error(error);
+      return;
+    }
+    // The results are in an array ordered by confidence.
+    // console.log(results[0]);
+    label = results[0].label;
+    // Classifiy again!
+    classifyVideo();
+  }
+</script>
