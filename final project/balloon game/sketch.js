@@ -1,5 +1,6 @@
 let size_balloon;
 let pop_number;
+let score = 0;
 
 function setup() {
   createCanvas(800, 600);
@@ -13,6 +14,7 @@ function draw() {
   textSize(36);
   fill(255);
   text("Balloon Risk Game", 160, 50);
+  text("Score: " + score, 150, 120);
   fill(255, 0, 0);
   noStroke(); 
   ellipse(width / 2, height / 2, size_balloon, size_balloon);
@@ -20,6 +22,7 @@ function draw() {
     size_balloon += 1;  
     console.log(pop_number);
     console.log(size_balloon);
+    score = size_balloon / 10;
   }
 }
   else if(size_balloon == pop_number){
